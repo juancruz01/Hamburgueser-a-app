@@ -69,7 +69,7 @@ export function OrderDrawer({ producto, children }: {producto : Producto, childr
                 <h4 className="font-bold text-slate-800 mb-4 italic uppercase">¿Quitar ingredientes?</h4>
                 <div className="flex flex-wrap gap-2">
                   {["Cebolla", "Pepinos", "Tomate"].map((ing) => (
-                    <button key={ing} className="px-4 py-2 rounded-full border border-slate-200 text-sm font-medium active:bg-red-50 active:border-red-200">
+                    <button key={ing} className="px-4 py-2 rounded-full border border-slate-300 text-gray-400 text-sm font-medium active:bg-red-50 active:border-red-200">
                       Sin {ing}
                     </button>
                   ))}
@@ -102,9 +102,9 @@ export function OrderDrawer({ producto, children }: {producto : Producto, childr
             <div className="max-w-md mx-auto flex items-center gap-4">
             {/* Selector de cantidad */}
                 <div className="flex items-center bg-slate-100 rounded-2xl p-1">
-                    <button onClick={() => setCantidad(Math.max(1, cantidad - 1))} className="p-3 bg-white rounded-xl shadow-sm"><Minus size={20}/></button>
-                    <span className="px-6 font-black text-xl">{cantidad}</span>
-                    <button onClick={() => setCantidad(cantidad + 1)} className="p-3 bg-white rounded-xl shadow-sm"><Plus size={20}/></button>
+                    <button onClick={() => setCantidad(Math.max(1, cantidad - 1))} className="p-3 bg-white text-gray-500 rounded-xl shadow-sm"><Minus size={20}/></button>
+                    <span className="px-6 font-black text-xl text-gray-600">{cantidad}</span>
+                    <button onClick={() => setCantidad(cantidad + 1)} className="p-3 bg-white text-gray-500 rounded-xl shadow-sm"><Plus size={20}/></button>
                 </div>
               
               {/* BOTÓN CONECTADO A ZUSTAND */}
