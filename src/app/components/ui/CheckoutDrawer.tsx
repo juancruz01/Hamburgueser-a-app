@@ -1,5 +1,7 @@
 "use client";
 
+import {supabase} from "../../lib/supabase";
+
 import { Drawer } from "vaul";
 import { useCartStore } from "../../store/useCartStore";
 import { useState } from "react";
@@ -11,27 +13,49 @@ export function CheckoutDrawer({ children }: { children: React.ReactNode }) {
   const [telefono, setTelefono] = useState("");
   const [metodoPago, setMetodoPago] = useState<"efectivo" | "transferencia">("efectivo");
 
+  const handleFinalizarPedido = async () => {
+  if (!nombre || !telefono) return;
+
   const total = cart.reduce((acc, item) => acc + item.totalItem, 0);
 
-  const handleFinalizarPedido = () => {
-    const nroOrden = Math.floor(1000 + Math.random() * 9000); // Generamos un nro de orden simple
-    
-    // Estructuramos el mensaje para WhatsApp
-    const productosMsg = cart.map(item => `- ${item.cantidad}x ${item.nombre} ($${item.totalItem})`).join("%0A");
-    
-    const texto = `*ORDEN NRO: #${nroOrden}*%0A%0A` +
-                  `*Cliente:* ${nombre}%0A` +
-                  `*Tel:* ${telefono}%0A` +
-                  `*Pago:* ${metodoPago.toUpperCase()}%0A%0A` +
-                  `*Pedido:*%0A${productosMsg}%0A%0A` +
-                  `*TOTAL: $${total}*%0A%0A` +
-                  `_Enviado desde Clay Burger Web_`;
+    console.log("Enviando pedido...", { nombre, telefono, metodoPago, total, cart });
+  // 1. Guardar en Supabase primero
+  const { data, error } = await supabase
+    .from('pedidos')
+    .insert([
+      {
+        cliente_nombre: nombre,
+        cliente_telefono: telefono,
+        metodo_pago: metodoPago,
+        total: total,
+        estado: 'pendiente',
+        detalles: cart // Guardamos el JSON completo del carrito
+      }
+    ])
+    .select();
 
-    const url = `https://wa.me/1159320255?text=${texto}`; // 👈 Reemplaza con tu nro (ej: 54911...)
-    
-    window.open(url, "_blank");
-    clearCart(); // Limpiamos el carrito tras el pedido
-  };
+    if (error) {
+        console.error("Error al guardar pedido:", error.message);
+        alert("Hubo un error al procesar tu pedido. Intenta de nuevo." + error.message);
+    return;
+  }
+
+  // 2. Si se guardó bien, procedemos con WhatsApp
+  const nroOrden = data[0].numero_orden; // Usamos el ID real de la base de datos
+  
+  const productosMsg = cart.map(item => `- ${item.cantidad}x ${item.nombre}`).join("%0A");
+  
+  const texto = `*ORDEN NRO: #${nroOrden}*%0A%0A` +
+                `*Cliente:* ${nombre}%0A` +
+                `*Pedido:*%0A${productosMsg}%0A%0A` +
+                `*TOTAL: $${total}*%0A%0A` +
+                `_Pedido registrado en sistema._`;
+
+  const url = `https://wa.me/1159320255?text=${texto}`;
+  
+  window.open(url, "_blank");
+  clearCart();
+};
 
   return (
     <Drawer.Root>
