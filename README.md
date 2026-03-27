@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+🍔 Clay Burger - Web App de Pedidos Real-Time
+Clay Burger es una plataforma moderna de comercio electrónico diseñada para una hamburguesería artesanal. El proyecto permite a los clientes personalizar sus pedidos y a los administradores gestionar la cocina en tiempo real.
 
-## Getting Started
+🚀 Funcionalidades Principales
+Menú Dinámico: Gestión de productos (hamburguesas, bebidas, etc.) desde una base de datos centralizada.
+
+Personalización Avanzada: Sistema de Extras (con impacto en el precio final) y Omisión de ingredientes (Sin cebolla, pepinos, etc.).
+
+Checkout Inteligente: Formulario de envío con validación de domicilio, entre calles y método de pago.
+
+Notificación por WhatsApp: Generación automática de un mensaje detallado con Número de Orden (#) único para el cliente.
+
+Panel de Administración (Kitchen Display):
+
+Visualización de pedidos entrantes en tiempo real mediante WebSockets.
+
+Alertas sonoras y visuales para nuevos pedidos.
+
+Botón de Despacho que cambia el estado en la DB y abre una ventana de WhatsApp para notificar al cliente que su pedido está en camino.
+
+Seguridad: Acceso al panel de administración protegido mediante login.
+
+🛠️ Tecnologías Utilizadas
+Frontend: Next.js 15 (App Router), React 19, Tailwind CSS.
+
+Backend & DB: Supabase (PostgreSQL + Realtime).
+
+Estado Global: Zustand.
+
+Componentes UI: Vaul (Drawers), Lucide React (Iconos).
+
+Lenguaje: TypeScript con tipado estricto.
+
+## Instalación y Configuración
 
 First, run the development server:
 
+Clona el repositorio:
+
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/tu-usuario/hamburgueseria-app.git
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Instala las dependencias:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm install
+```
+Configura las variables de entorno en un archivo .env.local:
+```bash
+NEXT_PUBLIC_SUPABASE_URL=tu_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_key
+ADMIN_PASSWORD=tu_clave
+```
+Inicia el servidor de desarrollo:
+```bash
+npm run dev
+```
