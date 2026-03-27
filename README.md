@@ -20,7 +20,7 @@ Botón de Despacho que cambia el estado en la DB y abre una ventana de WhatsApp 
 
 Seguridad: Acceso al panel de administración protegido mediante login.
 
-🛠️ Tecnologías Utilizadas
+## 🛠️ Tecnologías Utilizadas
 Frontend: Next.js 15 (App Router), React 19, Tailwind CSS.
 
 Backend & DB: Supabase (PostgreSQL + Realtime).
