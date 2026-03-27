@@ -1,6 +1,7 @@
 import Navbar from "./components/ui/Navbar";
 import Hero from "./components/sections/Hero";
 import Menu from "./components/sections/Menu";
+import { Footer } from "./components/ui/Footer";
 import { getProductos } from "./lib/supabase";
 import CartButton from "./components/ui/CartButton";
 
@@ -13,6 +14,7 @@ export default async function Page() {
       <Hero />
       <Menu productos={productos || []}/>
       <CartButton />
+      <Footer/>
       {/* El resto de tus secciones... */}
     </main>
   );

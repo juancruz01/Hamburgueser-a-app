@@ -5,11 +5,20 @@ import {supabase} from "../../lib/supabase";
 import { Drawer } from "vaul";
 import { useCartStore } from "../../store/useCartStore";
 import { useState } from "react";
-import { Smartphone, User, CreditCard, Send } from "lucide-react";
+import { User, MapPin, Navigation, Map, Smartphone, CreditCard, Send} from "lucide-react";
+
+interface ExtraItem {
+  id: string;
+  nombre: string;
+  precio: number;
+}
 
 export function CheckoutDrawer({ children }: { children: React.ReactNode }) {
   const { cart, clearCart } = useCartStore();
   const [nombre, setNombre] = useState("");
+  const [direccion, setDireccion] = useState("");
+  const [entreCalles, setEntreCalles] = useState("");
+  const [localidad, setLocalidad] = useState("");
   const [telefono, setTelefono] = useState("");
   const [metodoPago, setMetodoPago] = useState<"efectivo" | "transferencia">("efectivo");
 
@@ -34,8 +43,8 @@ export function CheckoutDrawer({ children }: { children: React.ReactNode }) {
     ])
     .select();
 
-    if (error) {
-        console.error("Error al guardar pedido:", error.message);
+    if (error || !data) {
+        console.error("Error Supabase:", error.message);
         alert("Hubo un error al procesar tu pedido. Intenta de nuevo." + error.message);
     return;
   }
@@ -43,15 +52,40 @@ export function CheckoutDrawer({ children }: { children: React.ReactNode }) {
   // 2. Si se guardó bien, procedemos con WhatsApp
   const nroOrden = data[0].numero_orden; // Usamos el ID real de la base de datos
   
-  const productosMsg = cart.map(item => `- ${item.cantidad}x ${item.nombre}`).join("%0A");
+  const productosMsg = cart.map(item => {
+    let itemText = `- ${item.cantidad}x ${item.nombre}`;
+    
+    // Si tiene extras, los sumamos al texto
+    if (item.extras && item.extras.length > 0) {
+      const extrasText = item.extras.map((e: ExtraItem) => `  + ${e.nombre}`).join("%0A");
+      itemText += `\n${extrasText}`;
+    }
+    
+    // Si quitó ingredientes, los sumamos
+    if (item.quitar && item.quitar.length > 0) {
+      const quitarText = item.quitar.map((q: string) => `  [SIN ${q.toUpperCase()}]`).join("%0A");
+      itemText += `\n${quitarText}`;
+    }
+    
+    return itemText;
+  }).join("\n\n");
   
-  const texto = `*ORDEN NRO: #${nroOrden}*%0A%0A` +
-                `*Cliente:* ${nombre}%0A` +
-                `*Pedido:*%0A${productosMsg}%0A%0A` +
-                `*TOTAL: $${total}*%0A%0A` +
-                `_Pedido registrado en sistema._`;
+  // 3. Texto final para WhatsApp
+  const texto = `*ORDEN NRO: #${nroOrden}*\n\n` +
+                   `*Cliente:* ${nombre}\n` +
+                   `*WhatsApp:* ${telefono}\n` +
+                   `*Dirección:* ${direccion}\n` +
+                   `*Entre calles:* ${entreCalles || 'No especifica'}\n` +
+                   `*Localidad:* ${localidad}\n` +
+                   `*Pago:* ${metodoPago.toUpperCase()}\n\n` +
+                   `*DETALLE DEL PEDIDO:*\n${productosMsg}\n\n` +
+                   `*TOTAL: $${total.toLocaleString('es-AR')}*\n\n` +
+                   `_Pedido registrado en Clay Burger_ 🍔`;
 
-  const url = `https://wa.me/1159320255?text=${texto}`;
+
+  const textoCodificado = encodeURIComponent(texto);
+
+  const url = `https://wa.me/5491159320255?text=${textoCodificado}`;
   
   window.open(url, "_blank");
   clearCart();
@@ -82,6 +116,48 @@ export function CheckoutDrawer({ children }: { children: React.ReactNode }) {
                   value={nombre}
                   onChange={(e) => setNombre(e.target.value)}
                   placeholder="Ej: Juan Pérez"
+                  className="w-full bg-slate-50 text-gray-600 border-none h-14 rounded-2xl px-5 font-bold focus:ring-2 focus:ring-orange-500 outline-none transition-all"
+                />
+              </div>
+
+              {/* CAMPO DIRECCIÓN Y ALTURA */}
+              <div className="space-y-2">
+                <label className="text-xs font-black uppercase text-slate-400 flex items-center gap-2">
+                  <MapPin size={14} /> Calle y Altura
+                </label>
+                <input 
+                  type="text" 
+                  value={direccion}
+                  onChange={(e) => setDireccion(e.target.value)}
+                  placeholder="Ej: Mitre 1234"
+                  className="w-full bg-slate-50 text-gray-600 border-none h-14 rounded-2xl px-5 font-bold focus:ring-2 focus:ring-orange-500 outline-none transition-all"
+                />
+              </div>
+
+              {/* CAMPO ENTRE CALLES */}
+              <div className="space-y-2">
+                <label className="text-xs font-black uppercase text-slate-400 flex items-center gap-2">
+                  <Navigation size={14} /> Entre Calles (Opcional)
+                </label>
+                <input 
+                  type="text" 
+                  value={entreCalles}
+                  onChange={(e) => setEntreCalles(e.target.value)}
+                  placeholder="Ej: Entre Bynnon y King"
+                  className="w-full bg-slate-50 text-gray-600 border-none h-14 rounded-2xl px-5 font-bold focus:ring-2 focus:ring-orange-500 outline-none transition-all"
+                />
+              </div>
+
+              {/* CAMPO LOCALIDAD */}
+              <div className="space-y-2">
+                <label className="text-xs font-black uppercase text-slate-400 flex items-center gap-2">
+                  <Map size={14} /> Localidad
+                </label>
+                <input 
+                  type="text" 
+                  value={localidad}
+                  onChange={(e) => setLocalidad(e.target.value)}
+                  placeholder="Ej: José Mármol"
                   className="w-full bg-slate-50 text-gray-600 border-none h-14 rounded-2xl px-5 font-bold focus:ring-2 focus:ring-orange-500 outline-none transition-all"
                 />
               </div>
@@ -135,7 +211,7 @@ export function CheckoutDrawer({ children }: { children: React.ReactNode }) {
           {/* BOTÓN FINAL DE ENVÍO */}
           <div className="p-6 border-t border-slate-100 bg-white pb-10">
             <button 
-              disabled={!nombre || !telefono}
+              disabled={!nombre || !telefono || !direccion || !localidad}
               onClick={handleFinalizarPedido}
               className="w-full max-w-md mx-auto bg-green-600 disabled:bg-slate-300 text-white h-16 rounded-2xl font-black text-lg flex items-center justify-center gap-3 shadow-xl active:scale-95 transition-all"
             >
