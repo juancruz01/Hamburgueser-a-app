@@ -1,4 +1,4 @@
-🍔 Clay Burger - Web App de Pedidos Real-Time
+## 🍔 Clay Burger - Web App de Pedidos Real-Time
 Clay Burger es una plataforma moderna de comercio electrónico diseñada para una hamburguesería artesanal. El proyecto permite a los clientes personalizar sus pedidos y a los administradores gestionar la cocina en tiempo real.
 
 🚀 Funcionalidades Principales
